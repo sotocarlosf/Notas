@@ -38,6 +38,7 @@ public class DisplayNote extends ActionBarActivity implements View.OnClickListen
     Intent intent;
     private String title;
     private String note;
+    String w;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
