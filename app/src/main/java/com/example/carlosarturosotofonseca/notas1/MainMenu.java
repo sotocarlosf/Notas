@@ -1,8 +1,11 @@
 package com.example.carlosarturosotofonseca.notas1;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,13 +14,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+import android.hardware.camera2.*;
 
 /**
  * Created by carlosarturosotofonseca on 24/06/15.
  */
 public class MainMenu extends Activity implements View.OnClickListener{
     private String TAG;
-    Button buttonAddNote, buttonAddAudio, buttonAddVideo, buttonMyNotes;
+    Button buttonAddNote, buttonAddAudio, buttonAddPhoto, buttonMyNotes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,16 +30,14 @@ public class MainMenu extends Activity implements View.OnClickListener{
 
         buttonAddNote = (Button) findViewById(R.id.buttonAddNote);
         buttonAddAudio = (Button) findViewById(R.id.buttonAddAudio);
-        buttonAddVideo = (Button) findViewById(R.id.buttonAddVideo);
+        buttonAddPhoto = (Button) findViewById(R.id.buttonAddPhoto);
         buttonMyNotes = (Button) findViewById(R.id.buttonMyNotes);
 
         buttonAddNote.setOnClickListener(this);
         buttonAddAudio.setOnClickListener(this);
-        buttonAddVideo.setOnClickListener(this);
+        buttonAddPhoto.setOnClickListener(this);
         buttonMyNotes.setOnClickListener(this);
-
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -81,9 +83,15 @@ public class MainMenu extends Activity implements View.OnClickListener{
                 Intent intentAddNote= new Intent(this, AddNote.class);
                 startActivity(intentAddNote);
                 break;
-            case R.id.buttonAddVideo:
-                Toast.makeText(this, "Add video", Toast.LENGTH_SHORT).show();
-                Log.i(TAG, "Add VIDEO/NOTE");
+            case R.id.buttonAddPhoto:
+                if(checkCameraHardware(this)){
+                    Toast.makeText(this, "Add photo", Toast.LENGTH_SHORT).show();
+                    Log.i(TAG, "numero de cam" + Integer.toString(Camera.getNumberOfCameras()));
+                    Intent intentAddCameraNote = new Intent(this, CameraActivity.class);
+                    startActivity(intentAddCameraNote);
+                }
+                else
+                    Toast.makeText(this, "Your phone does not have a camera", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.buttonAddAudio:
                 Toast.makeText(this, "Add audio", Toast.LENGTH_SHORT).show();
@@ -111,4 +119,14 @@ public class MainMenu extends Activity implements View.OnClickListener{
         return super.onOptionsItemSelected(item);
     }
 
+    /** Check if this device has a camera */
+    private boolean checkCameraHardware(Context context) {
+        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+            // this device has a camera
+            return true;
+        } else {
+            // no camera on this device
+            return false;
+        }
+    }
 }

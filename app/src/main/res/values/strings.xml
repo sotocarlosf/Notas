@@ -2,7 +2,7 @@
     <!--MainMenu-->
     <string name="app_name">Notas 1</string>
     <string name="addNoteButtonLabel">Add a note</string>
-    <string name="addVideoButtonLabel">Add a video/note</string>
+    <string name="addPhotoButtonLabel">Add a photo/note</string>
     <string name="addAudioButtonLabel">Add an audio/note</string>
     <string name="myNotesButtonLabel">View my notes</string>
     <string name="noteTitleAlertDialog">Type a title for your note</string>
