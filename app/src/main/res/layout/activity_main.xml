@@ -31,8 +31,8 @@
             >
 
             <Button
-                android:id="@+id/buttonAddVideo"
-                android:text="@string/addVideoButtonLabel"
+                android:id="@+id/buttonAddPhoto"
+                android:text="@string/addPhotoButtonLabel"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
