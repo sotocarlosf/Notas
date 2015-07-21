@@ -21,6 +21,18 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public Camera mCamera;
     List<Camera.Size> mSupportedPreviewSizes;
     private String TAG;
+    SurfaceView mSurfaceView;
+
+    CameraPreview (Context context, SurfaceView sv) {
+        super(context);
+
+        mSurfaceView = sv;
+//        addView(mSurfaceView);
+
+        mHolder = mSurfaceView.getHolder();
+        mHolder.addCallback(this);
+        mHolder.setType(SurfaceHolder.SURFACE_TYPE_NORMAL);
+    }
 
     public CameraPreview(Context context, Camera camera) {
         super(context);
@@ -38,9 +50,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void surfaceCreated(SurfaceHolder holder) {
         if (mCamera == null) {
             mCamera = Camera.open();
+            mCamera.setDisplayOrientation(90);
             try {
                 mCamera.setPreviewDisplay(holder);
-
                 // TODO test how much setPreviewCallbackWithBuffer is faster
                 mCamera.setPreviewCallback((Camera.PreviewCallback) this);
             } catch (IOException e) {
@@ -80,6 +92,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         try {
             mCamera.setPreviewDisplay(mHolder);
             mCamera.startPreview();
+            mCamera.setDisplayOrientation(90);
 
         } catch (Exception e){
             Log.d(TAG, "Error starting camera preview: " + e.getMessage());

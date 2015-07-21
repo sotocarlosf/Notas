@@ -27,7 +27,7 @@
         <activity android:name=".AddNote"></activity>
         <activity android:name=".ListNotes"></activity>
         <activity android:name=".DisplayNote"></activity>
-        <activity android:name=".CameraActivity"></activity>
+        <activity android:name=".AddPhotoNote"></activity>
 
     </application>
 
