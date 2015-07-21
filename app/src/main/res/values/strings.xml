@@ -15,6 +15,10 @@
     <string name="OkButton">Ok</string>
     <string name="DeleteButton">Delete</string>
     <string name="noteNewTitleAlertDialog">Type a new title</string>
+    <!--AddPhotoNote-->
+    <string name="captureButton">Capture</string>
+    <string name="addPhotoNoteCancelButton">Cancel</string>
+    <string name="flashButton">Flash</string>
     <!--ActionBar-->
     <string name="menuSettings">Settings</string>
     <string name="menuAbout">About it</string>

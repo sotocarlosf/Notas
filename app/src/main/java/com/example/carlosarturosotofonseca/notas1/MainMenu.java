@@ -3,10 +3,8 @@ package com.example.carlosarturosotofonseca.notas1;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -14,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-import android.hardware.camera2.*;
 
 /**
  * Created by carlosarturosotofonseca on 24/06/15.
@@ -87,7 +84,7 @@ public class MainMenu extends Activity implements View.OnClickListener{
                 if(checkCameraHardware(this)){
                     Toast.makeText(this, "Add photo", Toast.LENGTH_SHORT).show();
                     Log.i(TAG, "numero de cam" + Integer.toString(Camera.getNumberOfCameras()));
-                    Intent intentAddCameraNote = new Intent(this, CameraActivity.class);
+                    Intent intentAddCameraNote = new Intent(this, AddPhotoNote.class);
                     startActivity(intentAddCameraNote);
                 }
                 else

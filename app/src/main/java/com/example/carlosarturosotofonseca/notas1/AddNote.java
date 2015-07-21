@@ -38,11 +38,11 @@ package com.example.carlosarturosotofonseca.notas1;
  */
 public class AddNote extends ActionBarActivity implements View.OnClickListener {
 
-    private String TAG;
+    private Intent intent;
     private String note;
     private String title = "";
     private EditText editTextNote;
-    private Intent intent;
+    private String TAG;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +54,6 @@ public class AddNote extends ActionBarActivity implements View.OnClickListener {
 
         cancelNote.setOnClickListener(this);
         saveNote.setOnClickListener(this);
-
     }
 
     public void onClick(View v) {

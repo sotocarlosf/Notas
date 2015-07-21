@@ -3,13 +3,17 @@ package com.example.carlosarturosotofonseca.notas1;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -22,7 +26,7 @@ import java.io.IOException;
 /**
  * Created by carlosarturosotofonseca on 13/07/15.
  */
-public class CameraActivity extends Activity implements View.OnClickListener {
+public class AddPhotoNote extends Activity implements View.OnClickListener {
     private static final String TAG = "CameraActivityTest";
     Camera mCamera;
     CameraPreview mPreview;
@@ -36,25 +40,18 @@ public class CameraActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_add_photonote);
 
         Button captureButton = (Button) findViewById(R.id.button_capture);
-        Button imgClose = (Button) findViewById(R.id.buttonClose);
         captureButton.setOnClickListener(this);
-        imgClose.setOnClickListener(this);
 
-        mPreview = new CameraPreview(this, mCamera);
-        FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
-        preview.addView(mPreview);
+        mPreview = new CameraPreview(this, (SurfaceView)findViewById(R.id.camera_preview));
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        //Esto se usa para mantener la ventana activa mientras se encuentra en la actividad
     }
 
     @Override
     public void onClick(View v) {
-        switch(v.getId()){
+        switch(v.getId()) {
             case R.id.button_capture:
-                mCamera.takePicture(shutterCallback, rawCallback, jpegCallback);
-                break;
-            case R.id.buttonClose:
-                onPause();
-                Intent intent = new Intent(this, MainMenu.class);
-                startActivity(intent);
+                mCamera.takePicture(null, null, jpegCallback);
                 break;
         }
     }
@@ -98,18 +95,6 @@ public class CameraActivity extends Activity implements View.OnClickListener {
             new SaveImageTask().execute(data);
             resetCam();
             Log.d(TAG, "onPictureTaken - jpeg");
-        }
-    };
-
-    Camera.ShutterCallback shutterCallback = new Camera.ShutterCallback() {
-        public void onShutter() {
-            //			 Log.d(TAG, "onShutter'd");
-        }
-    };
-
-    Camera.PictureCallback rawCallback = new Camera.PictureCallback() {
-        public void onPictureTaken(byte[] data, Camera camera) {
-            //			 Log.d(TAG, "onPictureTaken - raw");
         }
     };
 
