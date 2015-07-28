@@ -1,11 +1,14 @@
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.carlosarturosotofonseca.notas1">
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <uses-feature android:name="android.permission.camera"></uses-feature>
     <uses-feature android:name="android.hardware.camera.autofocus"></uses-feature>
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
@@ -28,6 +31,7 @@
         <activity android:name=".ListNotes"></activity>
         <activity android:name=".DisplayNote"></activity>
         <activity android:name=".AddPhotoNote"></activity>
+        <activity android:name=".AddAudioNote"></activity>
 
     </application>
 

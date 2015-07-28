@@ -1,12 +1,15 @@
 package com.example.carlosarturosotofonseca.notas1;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.channels.FileChannel;
 import java.util.Arrays;
 
 /**
@@ -38,11 +42,13 @@ public class DisplayNote extends ActionBarActivity implements View.OnClickListen
     Intent intent;
     private String title;
     private String note;
+    private File parent_directory;
+    private File current_file;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Se obtiene el valor de position en int
+        // Position value is gotten in int
         String value = getIntent().getStringExtra("position");
         Integer position = Integer.parseInt(value);
         Log.i(TAG, "Position: " + Integer.toString(position));
@@ -55,11 +61,14 @@ public class DisplayNote extends ActionBarActivity implements View.OnClickListen
         okNote.setOnClickListener(this);
         deleteNote.setOnClickListener(this);
 
-        //Se adquiere el texto que se mostrara
+        parent_directory = getExternalStorageDir(this, getResources().getString(R.string.notesFile_name));
+        File[] list = parent_directory.listFiles();
+        current_file = list[position];
 
-        String note = getNote(position);
+        //Get the text that will be showed
+        String note = getNote(current_file);
 
-        //Se asigna el texto al campo en el que se mostrara
+        //Text is allocated inside its respective field
         TextView textViewNote = (TextView) findViewById(R.id.textViewNote);
         textViewNote.setText(note);
     }
@@ -104,6 +113,9 @@ public class DisplayNote extends ActionBarActivity implements View.OnClickListen
 
     }
 
+    /* Shows the dialog to write the desired title for the note, if that title already
+    exists it calls the showToast()
+     */
     public void newName_AlertDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -117,27 +129,28 @@ public class DisplayNote extends ActionBarActivity implements View.OnClickListen
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                // Se crea un objeto DIALOG para que el findVIewById busque en esta vista el editText
-                Dialog dialogView = (Dialog) dialog;
-                // Se asigna el valor escrito
+                // The written value is assigned
                 String newTitle = editTitleNote.getText().toString();
                 Log.i(TAG, "Title edited:" + newTitle);
 
-                // Se asigna el valor default si no se escribe nada
+                // If the user doesnt write anything it will enter the default title
                 if (newTitle.equals("")) {
-                    Toast.makeText(((Dialog) dialog).getContext(), "Write something!!", Toast.LENGTH_SHORT).show();
-                    Log.i(TAG, "El title es invalido");
+                    Toast.makeText(((Dialog) dialog).getContext(), "New title is invalid", Toast.LENGTH_SHORT).show();
+                    Log.i(TAG, "New title is invalid");
                 }
                 else{
-                    // Se salva el archivo
-                    String value = getIntent().getStringExtra("position");
-                    note = getNote(Integer.parseInt(value));
-                    deleteNote();
-                    saveNote(newTitle, note);
-
-                    Log.i(TAG, "CONFIRM pressed");
-                    intent = new Intent(getApplicationContext(), ListNotes.class);
-                    startActivity(intent);
+                    // Here is where this dialog differs with the ADDNOTE one
+                    if(checkTitleAvailability(parent_directory, newTitle)) {
+                        // The note is saved
+                        File f = new File(parent_directory, newTitle);
+                        saveNote(newTitle, getNote(current_file));
+                        current_file.delete();
+                        intent = new Intent(getApplicationContext(), ListNotes.class);
+                        startActivity(intent);
+                    }
+                    else{
+                        showToast();
+                    }
                 }
             }
 
@@ -157,6 +170,29 @@ public class DisplayNote extends ActionBarActivity implements View.OnClickListen
         dialog.show();
     }
 
+    /* Shows toast message to the overwriting title */
+    public void showToast(){
+        Toast.makeText(this, "This title already exists, try again", Toast.LENGTH_SHORT).show();
+    }
+
+    public static void copyFile(File src, File dst) throws IOException
+    {
+        FileChannel inChannel = new FileInputStream(src).getChannel();
+        FileChannel outChannel = new FileOutputStream(dst).getChannel();
+        try
+        {
+            inChannel.transferTo(0, inChannel.size(), outChannel);
+        }
+        finally
+        {
+            if (inChannel != null)
+                inChannel.close();
+            if (outChannel != null)
+                outChannel.close();
+        }
+    }
+
+    /*  Saves the note with the parameters entered, this having access to the global dir */
     public void saveNote (String title, String note){
         FileOutputStream fos;
         try {
@@ -168,28 +204,27 @@ public class DisplayNote extends ActionBarActivity implements View.OnClickListen
         } catch (IOException e) {
             Log.e(TAG, "ERROR" + Arrays.toString(e.getStackTrace()));
 
-        }
-        finally {
+        } finally {
             Log.i(TAG, "TEST done");
         }
 
         Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
     }
 
-    public String getNote(int position){
-        File[] list = getFilesDir().listFiles();
-        File file = list[position];
-        String note = readNote(file);
+    /*  Gets the text from the note with the current file */
+    public String getNote(File current_file){
+        String note = readNote(current_file);
         Log.i(TAG, "Note is: " + note);
-        setTitle(file.getName());
+        setTitle(current_file.getName());
         return note;
     }
 
+    /*  Reads the note from the file entered */
     public String readNote(File file){
         StringBuffer note = new StringBuffer("");
-        // FIS y ISR se complementan. InputStream lee los bytes, y tambien puede leer texto, pero
-        // fis es menos propenso a convertir mal cuando se trata de texto
-        // El bufferedreader se usara para leer la linea de texto completa y no de char por char
+        /* FIS y ISR complement. InputStream read the bytes,and also can read text, but fis is
+        less prone to convert badly when its about convert text. Bufferedreader is going to be used
+        to read the entire line and not char by char*/
         try{
             FileInputStream fin = openFileInput(file.getName());
             InputStreamReader isr = new InputStreamReader(fin);
@@ -211,19 +246,69 @@ public class DisplayNote extends ActionBarActivity implements View.OnClickListen
         return note.toString();
     }
 
+    /* Deletes the note */
     public void deleteNote(){
         String value = getIntent().getStringExtra("position");
         Integer position = Integer.parseInt(value);
 
-        File[] list = getFilesDir().listFiles();
+        File[] list = getExternalStorageDir(this,getResources().getString(R.string.notesFile_name)).listFiles();
         File file = list[position];
-        file.delete();
-        Log.i(TAG, "DELETED note");
+        if(file.delete()){
+            Log.i(TAG, "DELETED note");
+        }
     }
 
-    public void changeTitle(){
-
+    // Finds in external SD CARD the directory the entered directory
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public File getExternalStorageDir(Context context, String directory_name) {
+        if(!isExternalStorageReadable() || !isExternalStorageWritable()){
+            Log.e(TAG, "Failed to get the parent directory");
+            return null;
+        }
+        // Get the directory for the app's private new file
+        File[] f = context.getExternalFilesDirs(null);
+        for(int i = 0; i<f.length; i++){
+            Log.d(TAG, "External SD card " + i + ":" + f[i].getAbsolutePath());
+        }
+        File file = new File (f[1], directory_name);
+        if (!file.mkdirs()) {
+            Log.e(TAG, "Directory not created or already exists");
+        }
+        return file;
     }
+
+    /* Checks if external storage is available for read and write */
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    /* Checks if external storage is available to at least read */
+    public boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    //Returns true if this file name is available
+    public boolean checkTitleAvailability(File parent_file, String file_name){
+        if(parent_file.isDirectory()){
+            File [] files = parent_file.listFiles();
+            for(int i = 0; i < files.length; i++){
+                if(file_name.equals(files[i].getName())){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
