@@ -91,6 +91,8 @@ public class MainMenu extends Activity implements View.OnClickListener{
                     Toast.makeText(this, "Your phone does not have a camera", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.buttonAddAudio:
+                Intent intentAddAudioNote = new Intent(this, AddAudioNote.class);
+                startActivity(intentAddAudioNote);
                 Toast.makeText(this, "Add audio", Toast.LENGTH_SHORT).show();
                 Log.i(TAG, "Add AUDIO/NOTE");
                 break;

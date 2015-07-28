@@ -1,4 +1,6 @@
 <resources>
+    <!--Files-->
+    <string name="notesFile_name">NOTES</string>
     <!--MainMenu-->
     <string name="app_name">Notas 1</string>
     <string name="addNoteButtonLabel">Add a note</string>
