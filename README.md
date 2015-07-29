@@ -1,2 +1,2 @@
 # Notas
-Primera aplicación de CARLOS SOTO
+CARLOS SOTOS first android app
